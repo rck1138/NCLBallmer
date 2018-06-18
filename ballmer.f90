@@ -5,13 +5,14 @@ program genBallmer
 use netcdf
 implicit none
 
-integer, parameter :: npts=314
-character(len=*), parameter :: outfile = "ballmer.nc"
-real, parameter :: xmax = 0.35
-integer :: i
-real :: xpt
-real, dimension(npts+1) :: xvals,yvals
-integer :: ncid, xvarid, yvarid, dimid, r
+integer, parameter :: npts=1000                         ! number of data points
+character(len=*), parameter :: outfile = "ballmer.nc"   ! file to write data to
+real, parameter :: xmax = 0.28                          ! maximum x value 
+
+integer :: i                                            ! loop index       
+real :: xpt                                             ! x value
+real, dimension(npts+1) :: xvals,yvals                  ! arrays to hold x and y(x) data on [0,0.28]
+integer :: ncid, xvarid, yvarid, dimid, r               ! NetCDF ID variables and return code
 
 ! generate data on the ballmer peak
 print *, "Generating data for Ballmer Peak"
@@ -34,13 +35,18 @@ r=nf90_close(ncid)
 
 print *, "Data written to " // trim(outfile)
 
-
 contains
 
+! this function returns data to plot the ballmer peak
+! tuned to the interval 0 <= x <= 0.28
 function ballmer(x)
   real, intent(in) :: x
   real :: ballmer
-  ballmer = 0.03 + 0.97*exp(-(66.0*x*x)) + 2.6 * exp(-1.0e5*((x-0.134)**2))
+  ballmer = -0.042 +.08*(x+.7)**2              &  ! negative y-offset with slow rise as x increases   
+            + 1.28 * exp(-(75.0*(x+.022)**2))  &  ! low broad exponential (decreases as BAC increases)
+            + 3.14 * exp(-1.20e5*(x-0.134)**2) &  ! high narrow exponential for ballmer peak at 0.134
+            - 0.18 * exp(-1.8e3*(x-0.112)**2)  &  ! small exponential to correct curvature
+            + .003*sin(271*(x-.02))               ! sin function to add waviness
 end function ballmer
 
 end program genBallmer
