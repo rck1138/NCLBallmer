@@ -25,6 +25,7 @@ begin
  res@tiYAxisString     = "Programming Skill"         ; y-axis label
  res@tiXAxisString     = "BAC (%)"                   ; x-axis label
  res@tiMainString      = "The Ballmer Peak"          ; add title
+ res@tmYLOn            = False
 
  plot  = gsn_csm_xy (wks,x,y,res) ; create plot
 end
